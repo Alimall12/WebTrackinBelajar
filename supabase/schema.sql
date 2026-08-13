@@ -401,3 +401,23 @@ DROP TRIGGER IF EXISTS trg_checklist_status_touch ON user_checklist_status;
 CREATE TRIGGER trg_checklist_status_touch
   BEFORE UPDATE ON user_checklist_status
   FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+
+-- ---------------------------------------------------------------------
+-- AI Requests Table (rate limiting AI Mentor: 20 requests per 3 hours)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ai_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    request_at TIMESTAMPTZ DEFAULT NOW(),
+    message_tokens INT DEFAULT 0,
+    response_tokens INT DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_ai_requests_user_time 
+    ON ai_requests(user_id, request_at DESC);
+
+ALTER TABLE ai_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "ai requests own" ON ai_requests;
+CREATE POLICY "ai requests own" ON ai_requests FOR ALL TO authenticated
+    USING (auth.uid() = user_id) 
+    WITH CHECK (auth.uid() = user_id);
