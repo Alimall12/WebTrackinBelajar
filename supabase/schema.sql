@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     target_ptn   VARCHAR(250),
     target_major VARCHAR(250),
     target_date  DATE DEFAULT '2027-02-28',
+    target_score INT,
     is_admin     BOOLEAN DEFAULT FALSE,
     onboarded    BOOLEAN DEFAULT FALSE,
     created_at   TIMESTAMP WITH TIME ZONE DEFAULT NOW()

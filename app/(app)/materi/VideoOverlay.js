@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
 import { X, Loader2, CheckCircle2, NotebookPen, Check } from "lucide-react";
+import AIChat from "@/components/AIChat";
 
 export default function VideoOverlay({ subtopic, progress, onClose, onProgress, onComplete }) {
   const containerId = `yt-player-${subtopic.id}`;
@@ -22,49 +23,67 @@ export default function VideoOverlay({ subtopic, progress, onClose, onProgress, 
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  const chatContext = {
+    topicName: subtopic.topic_name,
+    subtopicName: subtopic.subtopic_name,
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl overflow-hidden rounded-xl bg-white shadow-xl"
+        className="flex h-full w-full max-w-6xl flex-col gap-4 lg:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-brand-600">
-              {subtopic.topic_name}
-            </p>
-            <h3 className="truncate font-semibold text-slate-800">{subtopic.subtopic_name}</h3>
-          </div>
-          <div className="flex items-center gap-3">
-            {progress?.is_belajar && (
-              <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                <CheckCircle2 className="h-4 w-4" /> Selesai
-              </span>
-            )}
-            <button onClick={onClose} className="btn-ghost !px-2" title="Tutup (Esc)">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-
-        <NotesCard subtopic={subtopic} />
-
-        <div className="relative aspect-video w-full bg-black">
-          {!ready && (
-            <div className="absolute inset-0 flex items-center justify-center text-white">
-              <Loader2 className="h-6 w-6 animate-spin" />
+        {/* Video column */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wide text-brand-600">
+                {subtopic.topic_name}
+              </p>
+              <h3 className="truncate font-semibold text-slate-800">{subtopic.subtopic_name}</h3>
             </div>
-          )}
-          {/* The IFrame API replaces this div with the player iframe */}
-          <div id={containerId} className="h-full w-full" />
+            <div className="flex items-center gap-3">
+              {progress?.is_belajar && (
+                <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" /> Selesai
+                </span>
+              )}
+              <button onClick={onClose} className="btn-ghost !px-2" title="Tutup (Esc)">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          <NotesCard subtopic={subtopic} />
+
+          <div className="relative aspect-video w-full bg-black">
+            {!ready && (
+              <div className="absolute inset-0 flex items-center justify-center text-white">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            )}
+            {/* The IFrame API replaces this div with the player iframe */}
+            <div id={containerId} className="h-full w-full" />
+          </div>
+
+          <p className="px-4 py-2 text-center text-xs text-slate-400">
+            Posisi tonton disimpan otomatis. Status &quot;Belajar&quot; tercentang saat tonton {">"}85%.
+          </p>
         </div>
 
-        <p className="px-4 py-2 text-center text-xs text-slate-400">
-          Posisi tonton disimpan otomatis. Status &quot;Belajar&quot; tercentang saat tonton {">"}85%.
-        </p>
+        {/* Chat column (desktop) */}
+        <div className="hidden w-80 flex-col overflow-hidden rounded-xl bg-white shadow-xl lg:flex">
+          <AIChat mode="embedded" context={chatContext} />
+        </div>
+
+        {/* Chat mobile (below video, collapsed by default) */}
+        <div className="h-64 overflow-hidden rounded-xl bg-white shadow-xl lg:hidden">
+          <AIChat mode="embedded" context={chatContext} />
+        </div>
       </div>
     </div>
   );

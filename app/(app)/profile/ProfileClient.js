@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_TARGET_DATE } from "@/lib/constants";
-import { GraduationCap, Loader2 } from "lucide-react";
+import { UserCircle, Loader2, CheckCircle2 } from "lucide-react";
 
-export default function OnboardingForm({ profile, email }) {
+export default function ProfileClient({ profile, userId }) {
   const supabase = createClient();
-  const router = useRouter();
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
   const [targetPtn, setTargetPtn] = useState(profile?.target_ptn || "");
@@ -17,24 +15,21 @@ export default function OnboardingForm({ profile, email }) {
   const [targetScore, setTargetScore] = useState(profile?.target_score || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setSuccess(false);
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
+      id: userId,
       full_name: fullName,
       target_ptn: targetPtn,
       target_major: targetMajor,
       target_date: targetDate,
       target_score: targetScore ? parseInt(targetScore, 10) : null,
-      onboarded: true,
     });
 
     setLoading(false);
@@ -42,23 +37,30 @@ export default function OnboardingForm({ profile, email }) {
       setError(error.message);
       return;
     }
-    router.push("/dashboard");
-    router.refresh();
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 3000);
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="card w-full max-w-lg p-8">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <GraduationCap className="mb-2 h-10 w-10 text-brand-600" />
-          <h1 className="text-2xl font-bold text-slate-800">Lengkapi Profil</h1>
-          <p className="text-sm text-slate-500">
-            Isi data ini sekali untuk memulai. Login sebagai {email}.
-          </p>
+    <div className="mx-auto max-w-2xl">
+      <div className="card p-6">
+        <div className="mb-6 flex items-center gap-3">
+          <UserCircle className="h-8 w-8 text-brand-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">Profil Saya</h1>
+            <p className="text-sm text-slate-500">Edit informasi profil Anda</p>
+          </div>
         </div>
 
         {error && (
           <div className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</div>
+        )}
+
+        {success && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-600">
+            <CheckCircle2 className="h-4 w-4" />
+            Profil berhasil diperbarui
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,6 +75,7 @@ export default function OnboardingForm({ profile, email }) {
               placeholder="Nama kamu"
             />
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label">PTN Tujuan</label>
@@ -97,6 +100,7 @@ export default function OnboardingForm({ profile, email }) {
               />
             </div>
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Target Tanggal Selesai Belajar</label>
@@ -107,7 +111,6 @@ export default function OnboardingForm({ profile, email }) {
                 onChange={(e) => setTargetDate(e.target.value)}
                 className="input"
               />
-              <p className="mt-1 text-xs text-slate-400">Default: 28 Februari 2027</p>
             </div>
             <div>
               <label className="label">Target Skor UTBK</label>
@@ -123,9 +126,10 @@ export default function OnboardingForm({ profile, email }) {
               <p className="mt-1 text-xs text-slate-400">Skala 0–1200 (opsional)</p>
             </div>
           </div>
+
           <button type="submit" disabled={loading} className="btn-primary w-full">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Simpan & Mulai
+            Simpan Perubahan
           </button>
         </form>
       </div>

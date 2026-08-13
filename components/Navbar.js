@@ -12,12 +12,16 @@ import {
   LogOut,
   GraduationCap,
   ListTodo,
+  UserCircle,
+  Timer,
 } from "lucide-react";
 
 const LINKS = [
   { href: "/dashboard", label: "Progress-Ku", icon: LayoutDashboard },
   { href: "/materi", label: "Materi", icon: BookOpen },
   { href: "/jadwal-saya", label: "Jadwal Saya", icon: ListTodo },
+  { href: "/fokus", label: "Fokus", icon: Timer },
+  { href: "/profile", label: "Profile", icon: UserCircle },
   { href: "/leaderboard", label: "Peringkat", icon: Trophy },
 ];
 

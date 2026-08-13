@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
+import AIChat from "@/components/AIChat";
 
 export default async function AppLayout({ children }) {
   const supabase = await createClient();
@@ -26,6 +27,7 @@ export default async function AppLayout({ children }) {
     <div className="min-h-screen">
       <Navbar profile={profile} />
       <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <AIChat />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
   ClipboardList,
   TrendingUp,
   ChevronRight,
+  Award,
 } from "lucide-react";
 import StreakGrid from "./StreakGrid";
 
@@ -85,7 +86,7 @@ export default function DashboardClient({
       </div>
 
       {/* Stat tiles */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile
           icon={Target}
           label="Kesiapan Total"
@@ -104,6 +105,7 @@ export default function DashboardClient({
           value={`${currentStreak} hari`}
           accent="text-orange-500"
         />
+        <TargetScoreCard profile={profile} tryouts={tryouts} />
       </div>
 
       {/* Quick links */}
@@ -293,4 +295,48 @@ function computeStreak(dates) {
     cur.setDate(cur.getDate() - 1);
   }
   return streak;
+}
+
+function TargetScoreCard({ profile, tryouts }) {
+  const targetScore = profile?.target_score;
+  
+  if (!targetScore) {
+    return (
+      <Link
+        href="/profile"
+        className="card flex items-center gap-4 p-4 transition-colors hover:border-brand-300 hover:bg-brand-50/40"
+      >
+        <div className="rounded-lg bg-slate-50 p-3 text-slate-400">
+          <Award className="h-6 w-6" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-slate-500">Target Skor UTBK</p>
+          <p className="text-sm font-medium text-slate-600">Belum diatur</p>
+        </div>
+        <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+      </Link>
+    );
+  }
+
+  // Latest tryout score
+  const latestTryout = tryouts && tryouts.length > 0 ? tryouts[tryouts.length - 1] : null;
+  const latestScore = latestTryout ? Number(latestTryout.average_score) : null;
+  const diff = latestScore !== null ? latestScore - targetScore : null;
+
+  return (
+    <div className="card flex items-center gap-4 p-4">
+      <div className="rounded-lg bg-slate-50 p-3 text-purple-600">
+        <Award className="h-6 w-6" />
+      </div>
+      <div>
+        <p className="text-xs text-slate-500">Target Skor UTBK</p>
+        <p className="text-2xl font-bold text-slate-800">{targetScore}</p>
+        {diff !== null && (
+          <p className={`text-xs font-medium ${diff >= 0 ? "text-emerald-600" : "text-orange-600"}`}>
+            {diff >= 0 ? "+" : ""}{diff} dari target
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
