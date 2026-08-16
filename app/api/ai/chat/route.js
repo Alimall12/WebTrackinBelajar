@@ -85,7 +85,13 @@ export async function POST(request) {
       resetAt,
     });
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("Gemini API error:", {
+      message: error.message,
+      status: error.status,
+      statusText: error.statusText,
+      isRateLimit: error.isRateLimit,
+      stack: error.stack,
+    });
 
     // Handle rate limit dari Google
     if (error.isRateLimit) {
