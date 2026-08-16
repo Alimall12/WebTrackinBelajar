@@ -90,6 +90,11 @@ export async function POST(request) {
       status: error.status,
       statusText: error.statusText,
       isRateLimit: error.isRateLimit,
+      // Log original error details jika ada (dari client.js)
+      originalStatus: error.originalStatus,
+      originalStatusText: error.originalStatusText,
+      originalMessage: error.originalMessage,
+      originalCode: error.originalCode,
       stack: error.stack,
     });
 
