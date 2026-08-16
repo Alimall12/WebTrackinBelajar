@@ -26,6 +26,7 @@ export default function VideoOverlay({ subtopic, progress, onClose, onProgress, 
   const chatContext = {
     topicName: subtopic.topic_name,
     subtopicName: subtopic.subtopic_name,
+    videoUrl: subtopic.video_id ? `https://www.youtube.com/watch?v=${subtopic.video_id}` : null,
   };
 
   return (

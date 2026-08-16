@@ -83,6 +83,7 @@ export default function AIChat({ mode = "floating", context = {} }) {
           messagesEndRef={messagesEndRef}
           sendMessage={sendMessage}
           hasContext={!!(context.topicName || context.subtopicName)}
+          hasVideo={!!context.videoUrl}
         />
         <ChatInput input={input} setInput={setInput} sendMessage={sendMessage} loading={loading} />
       </div>
@@ -134,7 +135,7 @@ function renderBold(text) {
   });
 }
 
-function ChatMessages({ messages, loading, messagesEndRef, sendMessage, hasContext }) {
+function ChatMessages({ messages, loading, messagesEndRef, sendMessage, hasContext, hasVideo }) {
   return (
     <div className="flex-1 space-y-3 overflow-y-auto p-4">
       {messages.length === 0 && (
@@ -191,7 +192,7 @@ function ChatMessages({ messages, loading, messagesEndRef, sendMessage, hasConte
         <div className="flex justify-start">
           <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin" />
-            AI sedang memikirkan...
+            {hasVideo ? "AI sedang menganalisis video..." : "AI sedang memikirkan..."}
           </div>
         </div>
       )}

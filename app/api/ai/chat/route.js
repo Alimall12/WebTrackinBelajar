@@ -14,6 +14,7 @@ export async function POST(request) {
   }
 
   const { message, context } = await request.json();
+  const videoUrl = context?.videoUrl || null;
 
   // Rate limit check: 20 requests per 3 jam
   const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
@@ -50,13 +51,17 @@ export async function POST(request) {
   }
 
   // Build system prompt dengan context dari frontend
-  const systemPrompt = buildSystemPrompt(context);
+  const systemPrompt = buildSystemPrompt({
+    ...context,
+    hasVideo: !!videoUrl,
+  });
 
   try {
     // Panggil Gemini API
     const { text, inputTokens, outputTokens } = await callGeminiAPI(
       message,
-      systemPrompt
+      systemPrompt,
+      videoUrl
     );
 
     // Log request ke database
